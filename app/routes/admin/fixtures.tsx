@@ -149,9 +149,11 @@ export default function ManageFixtures() {
 
 				return (
 					(startTime.getTime() >= fixtureStartTime.getTime() &&
-						startTime.getTime() <= fixtureEndTime.getTime()) ||
-					(endTime.getTime() >= fixtureStartTime.getTime() &&
-						endTime.getTime() <= fixtureEndTime.getTime())
+						startTime.getTime() < fixtureEndTime.getTime()) ||
+					(endTime.getTime() > fixtureStartTime.getTime() &&
+						endTime.getTime() <= fixtureEndTime.getTime()) ||
+					(startTime.getTime() <= fixtureStartTime.getTime() &&
+						endTime.getTime() >= fixtureEndTime.getTime())
 				)
 			})
 
@@ -173,9 +175,11 @@ export default function ManageFixtures() {
 
 				return (
 					(startTime.getTime() >= fixtureStartTime.getTime() &&
-						startTime.getTime() <= fixtureEndTime.getTime()) ||
-					(endTime.getTime() >= fixtureStartTime.getTime() &&
-						endTime.getTime() <= fixtureEndTime.getTime())
+						startTime.getTime() < fixtureEndTime.getTime()) ||
+					(endTime.getTime() > fixtureStartTime.getTime() &&
+						endTime.getTime() <= fixtureEndTime.getTime()) ||
+					(startTime.getTime() <= fixtureStartTime.getTime() &&
+						endTime.getTime() >= fixtureEndTime.getTime())
 				)
 			})
 
