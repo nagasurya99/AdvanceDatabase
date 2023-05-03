@@ -184,7 +184,7 @@ export default function BuyTickets() {
 												scope="col"
 												className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
 											>
-												Fixture
+												Match
 											</th>
 
 											<th
@@ -340,119 +340,166 @@ function TicketRow({
 	const isOrderCompleted = order.status === OrderStatus.SUCCESS
 	const isSubmitting = fetcher.state !== 'idle'
 
-	return (
-		<tr key={order.id}>
-			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
-				{order.scheduleId.slice(0, 8).toUpperCase()}
-			</td>
+	const [isTicketModalOpen, handleTicketModal] = useDisclosure(false)
 
-			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
-				<div className="flex flex-col">
-					<div className="font-medium text-gray-900">
-						{order.schedule.teamOne.name} vs {order.schedule.teamTwo.name}
+	return (
+		<>
+			<tr key={order.id}>
+				<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
+					{order.scheduleId.slice(0, 8).toUpperCase()}
+				</td>
+				<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
+					<div className="flex flex-col">
+						<div className="font-medium text-gray-900">
+							{order.schedule.teamOne.name} vs {order.schedule.teamTwo.name}
+						</div>
+						<div className="font-medium text-gray-500">
+							{order.schedule.stadium.name}
+						</div>
+						<div className="font-medium text-gray-500">
+							{formatDate(order.schedule.timeSlot?.date ?? new Date())}
+						</div>
+						<div className="text-gray-500">
+							{formatTime(order.schedule.timeSlot?.start ?? new Date())} -{' '}
+							{formatTime(order.schedule.timeSlot?.end ?? new Date())}
+						</div>
 					</div>
-					<div className="font-medium text-gray-500">
-						{order.schedule.stadium.name}
+				</td>
+				<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
+					{order.noOfTickets}
+				</td>
+				<td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
+					{formatCurrency(order.payment?.amount ?? 0)}
+				</td>
+				<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+					<Badge
+						className="max-w-min"
+						variant="outline"
+						fullWidth={false}
+						color={
+							order.payment?.status === PaymentStatus.PAID
+								? 'green'
+								: PaymentStatus.REFUNDED
+								? 'red'
+								: 'blue'
+						}
+					>
+						{titleCase(order.payment?.status ?? '')}
+					</Badge>
+				</td>
+				<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+					<Badge
+						className="max-w-min"
+						variant="dot"
+						fullWidth={false}
+						color={order.status === OrderStatus.SUCCESS ? 'green' : 'red'}
+					>
+						{orderStatusLookup(order.status)}
+					</Badge>
+				</td>
+				<td className="relative space-x-4 whitespace-nowrap py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6 md:pr-0">
+					<Popover
+						width={200}
+						position="bottom-start"
+						withArrow
+						shadow="md"
+						opened={showSeats}
+						disabled={!isOrderCompleted}
+					>
+						<Popover.Target>
+							<Button
+								onMouseEnter={() => handleShowSeats.open()}
+								onMouseLeave={() => handleShowSeats.close()}
+								variant="white"
+								compact
+								disabled={!isOrderCompleted}
+							>
+								View Seats
+							</Button>
+						</Popover.Target>
+						<Popover.Dropdown
+							sx={{pointerEvents: 'none'}}
+							className="whitespace-normal break-words"
+						>
+							{formatList(seats)}
+						</Popover.Dropdown>
+					</Popover>
+					<Button
+						variant="white"
+						compact
+						loaderPosition="right"
+						loading={isSubmitting}
+						disabled={!isOrderCompleted}
+						onClick={() => handleTicketModal.open()}
+					>
+						View Ticket
+					</Button>
+					<Button
+						variant="white"
+						compact
+						color="red"
+						loaderPosition="right"
+						loading={isSubmitting}
+						disabled={!isOrderCompleted}
+						onClick={() =>
+							fetcher.submit(
+								{
+									orderId: order.id,
+									intent: 'cancel-order',
+								},
+								{
+									method: 'post',
+									replace: true,
+									action: '/api/cancel-order',
+								}
+							)
+						}
+					>
+						Cancel Order
+					</Button>
+				</td>
+			</tr>
+
+			<Modal
+				opened={isTicketModalOpen}
+				onClose={() => handleTicketModal.close()}
+				title="Ticket Details"
+				centered
+			>
+				<div className="grid grid-cols-2 gap-4">
+					<div className="flex flex-col gap-2">
+						<Text size="sm" opacity={0.9}>
+							Ticket ID
+						</Text>
+						<Text size="sm" opacity={0.9}>
+							Seats
+						</Text>
+						<Text size="sm" opacity={0.9}>
+							Ticket Price
+						</Text>
+						<Text size="sm" opacity={0.9}>
+							Ticket Status
+						</Text>
 					</div>
-					<div className="font-medium text-gray-500">
-						{formatDate(order.schedule.timeSlot?.date ?? new Date())}
-					</div>
-					<div className="text-gray-500">
-						{formatTime(order.schedule.timeSlot?.start ?? new Date())} -{' '}
-						{formatTime(order.schedule.timeSlot?.end ?? new Date())}
+
+					<div className="flex flex-col gap-2">
+						<Text size="sm" opacity={0.7}>
+							{order.id.slice(0, 8).toUpperCase()}
+						</Text>
+						<Text size="sm" opacity={0.7}>
+							{order.noOfTickets} ({order.tickets.map(t => t.seatNo).join(', ')}
+							)
+						</Text>
+						<Text size="sm" opacity={0.7}>
+							{formatCurrency(order.payment?.amount ?? 0)}
+						</Text>
+						<Text size="sm" opacity={0.7}>
+							<Badge>{order.status}</Badge>
+						</Text>
 					</div>
 				</div>
-			</td>
-
-			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
-				{order.noOfTickets}
-			</td>
-
-			<td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
-				{formatCurrency(order.payment?.amount ?? 0)}
-			</td>
-
-			<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-				<Badge
-					className="max-w-min"
-					variant="outline"
-					fullWidth={false}
-					color={
-						order.payment?.status === PaymentStatus.PAID
-							? 'green'
-							: PaymentStatus.REFUNDED
-							? 'red'
-							: 'blue'
-					}
-				>
-					{titleCase(order.payment?.status ?? '')}
-				</Badge>
-			</td>
-
-			<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-				<Badge
-					className="max-w-min"
-					variant="dot"
-					fullWidth={false}
-					color={order.status === OrderStatus.SUCCESS ? 'green' : 'red'}
-				>
-					{orderStatusLookup(order.status)}
-				</Badge>
-			</td>
-
-			<td className="relative space-x-4 whitespace-nowrap py-4 pl-3 pr-4 text-left text-sm font-medium sm:pr-6 md:pr-0">
-				<Popover
-					width={200}
-					position="bottom-start"
-					withArrow
-					shadow="md"
-					opened={showSeats}
-					disabled={!isOrderCompleted}
-				>
-					<Popover.Target>
-						<Button
-							onMouseEnter={() => handleShowSeats.open()}
-							onMouseLeave={() => handleShowSeats.close()}
-							variant="white"
-							compact
-							disabled={!isOrderCompleted}
-						>
-							View Seats
-						</Button>
-					</Popover.Target>
-					<Popover.Dropdown
-						sx={{pointerEvents: 'none'}}
-						className="whitespace-normal break-words"
-					>
-						{formatList(seats)}
-					</Popover.Dropdown>
-				</Popover>
-
-				<Button
-					variant="white"
-					compact
-					color="red"
-					loaderPosition="right"
-					loading={isSubmitting}
-					disabled={!isOrderCompleted}
-					onClick={() =>
-						fetcher.submit(
-							{
-								orderId: order.id,
-								intent: 'cancel-order',
-							},
-							{
-								method: 'post',
-								replace: true,
-								action: '/api/cancel-order',
-							}
-						)
-					}
-				>
-					Cancel Order
-				</Button>
-			</td>
-		</tr>
+			</Modal>
+		</>
 	)
 }
 
