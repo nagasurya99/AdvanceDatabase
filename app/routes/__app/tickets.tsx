@@ -150,7 +150,7 @@ export default function BuyTickets() {
 								Back
 							</Button>
 							<h1 className="text-3xl font-semibold text-gray-900">
-								Manage Orders
+								Manage Tickets
 							</h1>
 							<p className="mt-2 text-sm text-gray-700">
 								A list of all the orders placed
@@ -173,6 +173,13 @@ export default function BuyTickets() {
 								<table className="min-w-full divide-y divide-gray-300">
 									<thead>
 										<tr>
+											<th
+												scope="col"
+												className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
+											>
+												Ticket ID
+											</th>
+
 											<th
 												scope="col"
 												className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
@@ -335,6 +342,10 @@ function TicketRow({
 
 	return (
 		<tr key={order.id}>
+			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
+				{order.scheduleId.slice(0, 8).toUpperCase()}
+			</td>
+
 			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 md:pl-0">
 				<div className="flex flex-col">
 					<div className="font-medium text-gray-900">
