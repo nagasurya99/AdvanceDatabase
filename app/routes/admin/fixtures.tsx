@@ -129,7 +129,7 @@ export default function ManageFixtures() {
 			return
 		}
 
-		if (fixtureStartTime >= fixtureEndTime) {
+		if (fixtureStartTime.getTime() >= fixtureEndTime.getTime()) {
 			setError('Fixture start-time must be before end-time')
 			return
 		}
@@ -148,8 +148,10 @@ export default function ManageFixtures() {
 				const endTime = new Date(fixture.timeSlot?.end ?? '')
 
 				return (
-					(startTime >= fixtureStartTime && startTime <= fixtureEndTime) ||
-					(endTime >= fixtureStartTime && endTime <= fixtureEndTime)
+					(startTime.getTime() >= fixtureStartTime.getTime() &&
+						startTime.getTime() <= fixtureEndTime.getTime()) ||
+					(endTime.getTime() >= fixtureStartTime.getTime() &&
+						endTime.getTime() <= fixtureEndTime.getTime())
 				)
 			})
 
@@ -170,8 +172,10 @@ export default function ManageFixtures() {
 				const endTime = new Date(fixture.timeSlot?.end ?? '')
 
 				return (
-					(startTime >= fixtureStartTime && startTime <= fixtureEndTime) ||
-					(endTime >= fixtureStartTime && endTime <= fixtureEndTime)
+					(startTime.getTime() >= fixtureStartTime.getTime() &&
+						startTime.getTime() <= fixtureEndTime.getTime()) ||
+					(endTime.getTime() >= fixtureStartTime.getTime() &&
+						endTime.getTime() <= fixtureEndTime.getTime())
 				)
 			})
 
