@@ -154,9 +154,7 @@ export default function BuyTickets() {
 							>
 								Back
 							</Button>
-							<h1 className="text-3xl font-semibold text-gray-900">
-								Manage Tickets
-							</h1>
+							<h1 className="text-3xl font-semibold text-gray-900">Tickets</h1>
 							<p className="mt-2 text-sm text-gray-700">
 								A list of all the orders placed
 							</p>
