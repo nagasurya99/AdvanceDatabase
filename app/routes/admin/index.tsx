@@ -1,7 +1,6 @@
 import {
 	BuildingOfficeIcon,
 	CalendarIcon,
-	TicketIcon,
 	UserGroupIcon,
 } from '@heroicons/react/24/solid'
 import type {LoaderArgs} from '@remix-run/node'
@@ -18,12 +17,12 @@ const actions = [
 		href: 'fixtures',
 		icon: CalendarIcon,
 	},
-	{
-		title: 'Orders',
-		description: 'View and manage orders',
-		href: 'orders',
-		icon: TicketIcon,
-	},
+	// {
+	// 	title: 'Orders',
+	// 	description: 'View and manage orders',
+	// 	href: 'orders',
+	// 	icon: TicketIcon,
+	// },
 	{
 		title: 'Teams',
 		description: 'View and manage teams',
