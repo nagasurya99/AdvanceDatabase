@@ -3,19 +3,23 @@ import {
 	Badge,
 	Button,
 	Group,
+	Input,
 	Modal,
 	NumberInput,
 	Popover,
 	Select,
 	Text,
 } from '@mantine/core'
+import {DatePicker} from '@mantine/dates'
 import {useDisclosure} from '@mantine/hooks'
 import type {Schedule, Zone} from '@prisma/client'
+import {PaymentMethod} from '@prisma/client'
 import {OrderStatus, PaymentStatus} from '@prisma/client'
 import type {ActionFunction} from '@remix-run/node'
 import {json} from '@remix-run/node'
 import {Link, useFetcher} from '@remix-run/react'
 import * as React from 'react'
+import ReactInputMask from 'react-input-mask'
 import {z} from 'zod'
 import {TailwindContainer} from '~/components/TailwindContainer'
 import {createOrder} from '~/lib/order.server'
@@ -69,6 +73,7 @@ export const action: ActionFunction = async ({request}) => {
 }
 
 export default function BuyTickets() {
+	const id = React.useId()
 	const fetcher = useFetcher<ActionData>()
 	const {orders, fixtures} = useAppData()
 
@@ -302,6 +307,52 @@ export default function BuyTickets() {
 						<p className="text-sm">
 							{totalPrice ? `Total price: ${formatCurrency(totalPrice)}` : null}
 						</p>
+
+						<Select
+							label="Payment method"
+							clearable={false}
+							required
+							data={Object.values(PaymentMethod).map(method => ({
+								label: titleCase(method.replace(/_/g, ' ')),
+								value: method,
+							}))}
+						/>
+
+						<Input.Wrapper id={id} label="Credit card number" required>
+							<Input
+								id={id}
+								component={ReactInputMask}
+								mask="9999 9999 9999 9999"
+								placeholder="XXXX XXXX XXXX XXXX"
+								alwaysShowMask={false}
+							/>
+						</Input.Wrapper>
+
+						<div className="flex items-center gap-4">
+							<Input.Wrapper id={id + 'cvv'} label="CVV" required>
+								<Input
+									id={id + 'cvv'}
+									name="cvv"
+									component={ReactInputMask}
+									mask="999"
+									placeholder="XXX"
+									alwaysShowMask={false}
+								/>
+							</Input.Wrapper>
+
+							<DatePicker
+								name="expiryDate"
+								label="Expiry"
+								inputFormat="MM/YYYY"
+								clearable={false}
+								placeholder="MM/YYYY"
+								labelFormat="MM/YYYY"
+								minDate={new Date()}
+								initialLevel="year"
+								hideOutsideDates
+								required
+							/>
+						</div>
 
 						<div className="mt-1 flex items-center justify-end gap-4">
 							<Button
